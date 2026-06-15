@@ -1,0 +1,117 @@
+import React, { useState } from 'react';
+import { Play } from 'lucide-react';
+
+export default function MediaRenderer({ src, className, alt = "Media", onClick, interactive = false }: { src: string, className?: string, alt?: string, onClick?: (e: React.MouseEvent) => void, interactive?: boolean }) {
+  const [videoError, setVideoError] = useState(false);
+
+  if (!src) return null;
+
+  const objectFit = className?.includes('object-contain') ? 'object-contain' : 'object-cover';
+
+  // YouTube logic
+  const ytMatch = src.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+  if (ytMatch && ytMatch[1]) {
+    const ytId = ytMatch[1];
+    if (!interactive) {
+      return (
+        <div className={`relative overflow-hidden bg-black ${className || ''}`} onClick={onClick}>
+          <img src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`} alt={alt} className={`absolute inset-0 w-full h-full ${objectFit}`} />
+          <div className="absolute inset-0 bg-black/20 flex flex-col items-center justify-center transition-colors hover:bg-black/40 cursor-pointer pointer-events-none">
+            <div className="w-16 h-16 bg-brand-blue/90 text-white rounded-full flex items-center justify-center shadow-2xl backdrop-blur-sm">
+              <Play className="w-8 h-8 ml-1" />
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className={`relative overflow-hidden bg-black ${className || ''}`} onClick={onClick}>
+        <iframe src={`https://www.youtube.com/embed/${ytId}?autoplay=1`} className="absolute inset-0 w-full h-full" allowFullScreen allow="autoplay; encrypted-media"></iframe>
+      </div>
+    );
+  }
+
+  // Vimeo logic
+  const vimeoMatch = src.match(/(?:vimeo\.com\/)(\d+)/i);
+  if (vimeoMatch && vimeoMatch[1]) {
+    const vimeoId = vimeoMatch[1];
+    return (
+      <div className={`relative overflow-hidden bg-black ${className || ''}`} onClick={onClick}>
+        <iframe src={`https://player.vimeo.com/video/${vimeoId}${interactive ? '?autoplay=1' : ''}`} className="absolute inset-0 w-full h-full" allowFullScreen style={!interactive ? { pointerEvents: 'none' } : undefined}></iframe>
+      </div>
+    );
+  }
+
+  // Google Drive
+  const driveIdMatch = src.match(/id=([^&]+)/) || src.match(/file\/d\/([^/]+)/);
+  if (driveIdMatch && driveIdMatch[1] && (src.includes('drive.google.com') || src.includes('docs.google.com'))) {
+    const fileId = driveIdMatch[1];
+    const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+    const thumbnailUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+
+    if (!interactive) {
+      return (
+        <div className={`relative overflow-hidden bg-black ${className || ''}`} onClick={onClick}>
+          <img src={thumbnailUrl} alt={alt} className={`absolute inset-0 w-full h-full ${objectFit}`} referrerPolicy="no-referrer" />
+          <div className="absolute inset-0 bg-black/20 flex flex-col items-center justify-center transition-colors hover:bg-black/40 cursor-pointer pointer-events-none">
+            <div className="w-16 h-16 bg-brand-blue/90 text-white rounded-full flex items-center justify-center shadow-2xl backdrop-blur-sm">
+              <Play className="w-8 h-8 ml-1" />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className={`relative overflow-hidden bg-black ${className || ''}`} onClick={onClick}>
+        <iframe 
+          src={previewUrl} 
+          className="absolute inset-0 w-full h-full" 
+          frameBorder="0" 
+          allow="autoplay; encrypted-media" 
+          allowFullScreen
+          title={alt}
+        ></iframe>
+      </div>
+    );
+  }
+
+  // Fallback to generic mp4/webm video
+  const isVideoMp4 = src.toLowerCase().endsWith('.mp4') || src.toLowerCase().endsWith('.webm');
+  if (isVideoMp4) {
+    if (videoError) {
+      return (
+        <img src={src} alt={alt} className={className} onClick={onClick} />
+      );
+    }
+    return (
+      <div className={`relative overflow-hidden bg-black ${className || ''}`} onClick={onClick}>
+        <video 
+          src={src} 
+          className={`absolute inset-0 w-full h-full ${objectFit}`}
+          controls={interactive} 
+          onError={() => setVideoError(true)}
+          style={!interactive ? { pointerEvents: 'none' } : undefined}
+          preload="metadata"
+        />
+        {!interactive && (
+          <div className="absolute inset-0 bg-black/20 flex flex-col items-center justify-center transition-colors hover:bg-black/40 cursor-pointer pointer-events-none">
+            <div className="w-16 h-16 bg-brand-blue/90 text-white rounded-full flex items-center justify-center shadow-2xl backdrop-blur-sm">
+              <Play className="w-8 h-8 ml-1" />
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={src} 
+      alt={alt} 
+      className={className} 
+      referrerPolicy="no-referrer"
+      onClick={onClick}
+    />
+  );
+}

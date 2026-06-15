@@ -3,14 +3,42 @@
 
 @theme {
   --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
-  --color-brand-blue: #0B1C2D;
+  --color-brand-blue: #0A32FF;
   --color-brand-black: #0F0F12;
   --color-brand-white: #FFFFFF;
 }
+
+@custom-variant dark (&:is(.dark *));
 
 body {
   font-family: "Poppins", sans-serif;
   background-color: var(--color-brand-white);
   color: var(--color-brand-black);
+}
+
+.dark body {
+  background-color: var(--color-brand-black);
+  color: var(--color-brand-white);
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.glass-dark {
+  background: rgba(15, 15, 18, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.text-gradient {
+  background: linear-gradient(to right, #0A32FF, #00D4FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
