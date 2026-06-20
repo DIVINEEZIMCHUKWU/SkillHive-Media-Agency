@@ -9,13 +9,13 @@ export default function Team() {
  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
  useEffect(() => {
-  const loadTeam = () => {
-   setTeam(getTeam());
-  };
-  
-  loadTeam();
-  window.addEventListener('teamUpdated', loadTeam);
-  return () => window.removeEventListener('teamUpdated', loadTeam);
+   const loadTeam = () => {
+    setTeam(getTeam());
+   };
+
+   loadTeam();
+   window.addEventListener('teamUpdated', loadTeam);
+   return () => window.removeEventListener('teamUpdated', loadTeam);
  }, []);
 
  const defaultTeam: TeamMember[] = [
@@ -89,14 +89,16 @@ export default function Team() {
       >
        <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
        
-       <div 
-        className="relative w-64 h-64 md:w-72 md:h-72 mx-auto mb-8 rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-white/10 group-hover:border-brand-blue/30 group-hover:scale-105 transition-all duration-500 z-10 cursor-pointer"
+    <div 
+     className={`relative w-72 h-72 md:w-80 md:h-80 mx-auto mb-8 rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-white/10 group-hover:border-brand-blue/30 group-hover:scale-105 transition-all duration-500 z-10 cursor-pointer ${member.name === 'DABERECHI GIFT' ? 'md:w-96 md:h-96 w-80 h-80' : ''}`}
         onClick={() => setSelectedImage(parseImages(member.image)[0])}
        >
         <img 
          src={parseImages(member.image)[0]} 
          alt={member.name} 
-         className={`w-full h-full object-cover ${(member.name === 'DIVINE' || member.name === 'DABERECHI GIFT' || member.name === 'DIVINE EZIMCHUKWU') ? 'object-top' : 'object-center'}`}
+         className={`w-full h-full object-cover ${
+          (member.name === 'DIVINE' || member.name === 'DIVINE EZIMCHUKWU') ? 'object-top' : (member.name === 'DABERECHI GIFT' ? 'object-top transform -translate-y-3 md:-translate-y-6' : 'object-center')
+         }`}
          referrerPolicy="no-referrer"
         />
        </div>

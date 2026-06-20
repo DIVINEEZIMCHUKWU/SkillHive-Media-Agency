@@ -36,8 +36,8 @@ export default function Services() {
    
    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
     <div className="text-center max-w-3xl mx-auto mb-20">
-     <h1 className="text-3xl md:text-5xl font-bold text-brand-black dark:text-white mb-6">Our Services</h1>
-     <p className="text-xl text-gray-600 dark:text-gray-400">
+     <h1 className="text-3xl md:text-4xl font-bold text-brand-black dark:text-white mb-6">Our Services</h1>
+     <p className="text-base text-gray-600 dark:text-gray-400">
       Comprehensive digital solutions designed to elevate your brand, engage your audience, and drive measurable growth.
      </p>
     </div>
@@ -52,9 +52,9 @@ export default function Services() {
        <div className="w-16 h-16 bg-gradient-to-br from-brand-blue/20 to-blue-600/20 rounded-2xl flex items-center justify-center text-brand-blue dark:text-blue-400 mb-8 group-hover:scale-110 group-hover:from-brand-blue group-hover:to-blue-600 group-hover:text-brand-black dark:text-white transition-all shadow-inner border border-gray-200 dark:border-white/5">
         {service.icon}
        </div>
-       <h2 className="text-3xl font-bold text-brand-black dark:text-white mb-4 group-hover:text-brand-blue dark:group-hover:text-blue-300 transition-colors">{service.title}</h2>
-       <p className="text-lg text-gray-600 dark:text-gray-400 mb-10 flex-grow leading-relaxed">{service.description}</p>
-       <div className="flex items-center gap-2 text-brand-blue dark:text-blue-400 font-semibold text-lg group-hover:text-brand-black dark:text-white group-hover:gap-4 transition-all">
+    <h2 className="text-2xl font-bold text-brand-black dark:text-white mb-4 group-hover:text-brand-blue dark:group-hover:text-blue-300 transition-colors">{service.title}</h2>
+    <p className="text-base text-gray-600 dark:text-gray-400 mb-10 flex-grow leading-relaxed">{service.description}</p>
+    <div className="flex items-center gap-2 text-brand-blue dark:text-blue-400 font-semibold text-base group-hover:text-brand-black dark:text-white group-hover:gap-4 transition-all">
         Learn More
         <ArrowRight className="w-5 h-5" />
        </div>

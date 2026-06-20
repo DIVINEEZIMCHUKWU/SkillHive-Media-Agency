@@ -11,16 +11,16 @@ export default function Contact() {
    
    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
     <div className="text-center max-w-3xl mx-auto mb-20">
-     <h1 className="text-3xl md:text-5xl font-bold text-brand-black dark:text-white mb-6">Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-blue-400">Touch</span></h1>
-     <p className="text-xl text-brand-black/70 dark:text-brand-white/70">
+    <h1 className="text-3xl md:text-4xl font-bold text-brand-black dark:text-white mb-6">Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-blue-400">Touch</span></h1>
+    <p className="text-base text-brand-black/70 dark:text-brand-white/70">
       Have a question or ready to start a project? We'd love to hear from you. Reach out to our team below.
      </p>
     </div>
 
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
      {/* Contact Info */}
-     <div>
-      <h2 className="text-3xl font-bold text-brand-black dark:text-white mb-8">Contact Information</h2>
+    <div>
+     <h2 className="text-2xl font-bold text-brand-black dark:text-white mb-8">Contact Information</h2>
       <div className="space-y-8 mb-12">
        <div className="flex items-start gap-4">
         <div className="w-12 h-12 bg-gradient-to-br from-brand-blue/20 to-blue-600/20 rounded-xl flex items-center justify-center text-brand-blue dark:text-blue-400 flex-shrink-0 border border-gray-200 dark:border-white/5">

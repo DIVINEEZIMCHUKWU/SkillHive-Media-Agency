@@ -21,7 +21,8 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 
 export default function Layout() {
  const [isMenuOpen, setIsMenuOpen] = useState(false);
- const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+ const [theme, setTheme] = useState<'light' | 'dark'>('light');
+ const [scrolled, setScrolled] = useState(false);
  const location = useLocation();
 
  useEffect(() => {
@@ -44,9 +45,16 @@ export default function Layout() {
    if (savedTheme === 'dark') document.documentElement.classList.add('dark');
    else document.documentElement.classList.remove('dark');
   } else {
-   document.documentElement.classList.add('dark');
-   localStorage.setItem('theme', 'dark');
+   document.documentElement.classList.remove('dark');
+   localStorage.setItem('theme', 'light');
   }
+ }, []);
+
+ useEffect(() => {
+  const onScroll = () => setScrolled(window.scrollY > 8);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  return () => window.removeEventListener('scroll', onScroll);
  }, []);
 
  const toggleTheme = () => {
@@ -76,43 +84,50 @@ export default function Layout() {
  return (
   <div className="flex flex-col min-h-screen">
    {/* Navigation */}
-   <nav className="fixed w-full z-50 bg-white/80 dark:bg-brand-black/80 backdrop-blur-lg border-b border-gray-200 dark:border-white/10">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-     <div className="flex justify-between items-center h-20">
-      <Link to="/" className="flex items-center gap-2 group">
-       <img src="https://i.ibb.co/dwQtCCjV/20260528-120300.png" alt="SkillHive Media Logo" className="h-8 md:h-10 w-auto transform group-hover:scale-105 transition-all bg-white p-1.5 rounded-lg" />
-       <span className="font-black text-lg md:text-xl tracking-tight text-brand-black dark:text-white">SkillHive Media</span>
-      </Link>
+  <nav className={`fixed w-full z-50 transition-colors duration-200 border-b ${scrolled ? 'backdrop-blur-md bg-white/70 dark:bg-brand-black/70 shadow-sm' : 'bg-white/80 dark:bg-brand-black/80'}`}>
+   <div className="max-w-[1280px] mx-auto px-6 sm:px-8 lg:px-10 h-full">
+    <div className="flex items-center h-20">
+    <div className="flex items-center flex-shrink-0 mr-6">
+     <Link to="/" className="flex items-center gap-3 group">
+      <img src="https://i.ibb.co/dwQtCCjV/20260528-120300.png" alt="SkillHive Logo" className="h-8 md:h-10 w-auto transform group-hover:scale-105 transition-all bg-white p-1.5 rounded-lg" />
+      <span className="font-black text-lg md:text-xl tracking-tight text-brand-black dark:text-white hidden sm:inline">SkillHive</span>
+     </Link>
+    </div>
 
-      {/* Desktop Nav */}
-      <div className="hidden md:flex items-center gap-2 lg:gap-6">
-       {navLinks.map((link) => (
-        <Link
-         key={link.path}
-         to={link.path}
-         className={`text-xs lg:text-sm font-bold transition-colors px-1 ${
-          location.pathname === link.path ? 'text-brand-blue' : 'text-gray-600 dark:text-gray-300 hover:text-brand-black dark:hover:text-white'
-         }`}
-        >
-         {link.name}
-        </Link>
-       ))}
-       <div className="flex items-center gap-3 lg:gap-4 border-l border-gray-200 dark:border-white/10 pl-4 lg:pl-8">
-        <button
-         onClick={toggleTheme}
-         className="p-1.5 lg:p-2 rounded-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-brand-black dark:text-white hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
-         aria-label="Toggle theme"
-        >
-         {theme === 'dark' ? <Sun className="w-4 h-4 lg:w-5 lg:h-5" /> : <Moon className="w-4 h-4 lg:w-5 lg:h-5" />}
-        </button>
-        <Link
-         to="/book-consultation"
-         className="bg-brand-blue text-white px-4 lg:px-6 py-2 lg:py-2.5 rounded-full text-xs lg:text-sm font-bold hover:bg-blue-600 transition-colors shadow-lg whitespace-nowrap"
-        >
-         Book Consultation
-        </Link>
-       </div>
-      </div>
+    {/* Middle - navigation links (reserve space for right controls) */}
+    <div className="hidden md:flex flex-1 justify-center items-center overflow-hidden" style={{ maxWidth: 'calc(100% - 260px)' }}>
+     <nav className="flex items-center gap-2 lg:gap-2 flex-nowrap">
+      {navLinks.map((link) => (
+       <Link
+        key={link.path}
+        to={link.path}
+        className={`text-sm font-medium transition-colors px-2 py-1 whitespace-nowrap ${
+         location.pathname === link.path ? 'text-brand-blue' : 'text-gray-600 dark:text-gray-300 hover:text-brand-black dark:hover:text-white'
+        }`}
+       >
+        {link.name}
+       </Link>
+      ))}
+     </nav>
+    </div>
+
+    {/* Right Controls */}
+    <div className="flex items-center gap-3 lg:gap-4 ml-auto border-l border-gray-200 dark:border-white/10 pl-4 lg:pl-6 flex-shrink-0">
+     <button
+      onClick={toggleTheme}
+      className="p-1.5 lg:p-2 rounded-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-brand-black dark:text-white hover:bg-gray-200 dark:hover:bg-white/10 transition-colors flex-shrink-0"
+      aria-label="Toggle theme"
+     >
+      {theme === 'dark' ? <Sun className="w-4 h-4 lg:w-5 lg:h-5" /> : <Moon className="w-4 h-4 lg:w-5 lg:h-5" />}
+     </button>
+       <Link
+        to="/book-consultation"
+        className="bg-brand-blue text-white px-4 lg:px-6 py-2 lg:py-2.5 rounded-full text-sm font-bold hover:bg-blue-600 transition-transform hover:-translate-y-0.5 shadow-lg whitespace-nowrap flex-shrink-0"
+        style={{ marginRight: 6 }}
+       >
+        Book Consultation
+       </Link>
+    </div>
 
       {/* Mobile menu button */}
       <div className="flex md:hidden items-center gap-4">
@@ -185,9 +200,9 @@ export default function Layout() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
       <div className="lg:col-span-1">
-       <Link to="/" className="flex items-center gap-3 mb-6">
-        <img src="https://i.ibb.co/dwQtCCjV/20260528-120300.png" alt="SkillHive Media Logo" className="h-8 md:h-10 w-auto bg-white p-1.5 rounded-lg" />
-        <span className="font-bold text-lg md:text-xl tracking-tight text-brand-black dark:text-white">SkillHive Media</span>
+      <Link to="/" className="flex items-center gap-4 mb-6">
+        <img src="https://i.ibb.co/dwQtCCjV/20260528-120300.png" alt="SkillHive Logo" className="h-8 md:h-10 w-auto bg-white p-1.5 rounded-lg" />
+        <span className="font-bold text-lg md:text-xl tracking-tight text-brand-black dark:text-white">SkillHive</span>
        </Link>
        <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm mb-6">
         Empowering businesses and equipping individuals with in-demand digital skills since day one.

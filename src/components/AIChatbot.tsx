@@ -29,14 +29,22 @@ export default function AIChatbot() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ messages: newMessages })
    });
-   const data = await res.json();
-   if (data.text) {
-    setMessages((prev) => [...prev, { role: 'ai', text: data.text }]);
-   } else {
-    setMessages((prev) => [...prev, { role: 'ai', text: data.error || 'Sorry, I encountered an error. Please try again.' }]);
-   }
+    let data: any = null;
+    try {
+     data = await res.json();
+    } catch (e) {
+     data = null;
+    }
+
+    if (res.ok && data && data.text) {
+     setMessages((prev) => [...prev, { role: 'ai', text: data.text }]);
+    } else {
+     const serverMsg = data?.error || data?.message || res.statusText || 'Sorry, I encountered an error. Please try again.';
+     setMessages((prev) => [...prev, { role: 'ai', text: serverMsg }]);
+    }
   } catch (error) {
-   setMessages((prev) => [...prev, { role: 'ai', text: 'Network error. Please try again later.' }]);
+    const message = (error as any)?.message || 'Network error. Please try again later.';
+    setMessages((prev) => [...prev, { role: 'ai', text: message }]);
   } finally {
    setIsLoading(false);
   }
