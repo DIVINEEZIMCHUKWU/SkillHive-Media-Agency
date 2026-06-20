@@ -1,5 +1,9 @@
 import express from "express";
 import path from "path";
+import dotenv from 'dotenv';
+
+// Load .env into process.env for the server (ensures GEMINI_API_KEY is available)
+dotenv.config();
 
 async function startServer() {
   const app = express();
@@ -110,9 +114,12 @@ async function startServer() {
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
-    // We conditionally dynamically import vite so it is not required in production
+    // Dynamically import Vite and create a middleware-only server without loading
+    // the project's vite.config.ts to avoid resolution issues in the runtime loader.
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
+      configFile: false,
+      root: process.cwd(),
       server: { middlewareMode: true },
       appType: "spa",
     });
