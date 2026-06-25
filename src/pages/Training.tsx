@@ -3,6 +3,8 @@ import { ArrowRight, BookOpen, X, Calendar as CalendarIcon } from 'lucide-react'
 import { useState, useEffect } from 'react';
 import { TrainingCourse, getCourses, parseImages } from '../lib/store';
 import { motion, AnimatePresence } from 'motion/react';
+import ImageCarousel from '../components/ImageCarousel';
+import ImageGallery from '../components/ImageGallery';
 import MediaRenderer from '../components/MediaRenderer';
 
 export default function Training() {
@@ -45,15 +47,7 @@ export default function Training() {
         {course.image && (
          <div className="aspect-[4/5] sm:aspect-square relative flex items-center justify-center overflow-hidden border-b border-gray-200 dark:border-white/10 bg-[#0a0f1c]">
           <div className="absolute inset-0 bg-brand-blue/10 mix-blend-multiply group-hover:bg-transparent transition-colors z-20 pointer-events-none"></div>
-          {parseImages(course.image).length > 1 ? (
-           <div className="w-full h-full flex overflow-x-auto snap-x snap-mandatory pointer-events-none no-scrollbar">
-            {parseImages(course.image).map((img, idx) => (
-             <MediaRenderer interactive={false} key={idx} src={img} alt={`${course.title} ${idx + 1}`} className="w-full h-full flex-shrink-0 object-contain snap-center transition-transform duration-500 group-hover:scale-105" />
-            ))}
-           </div>
-          ) : (
-           <MediaRenderer interactive={false} src={parseImages(course.image)[0]} alt={course.title} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 pointer-events-none" />
-          )}
+          <ImageCarousel images={parseImages(course.image)} altBase={course.title} interactive={false} mediaClassName="w-full h-full object-contain" />
          </div>
         )}
         <div className="p-8 flex flex-col flex-grow">
@@ -114,8 +108,11 @@ export default function Training() {
         </button>
         <div className="overflow-y-auto no-scrollbar flex-grow bg-white dark:bg-[#0a0f1c]">
          {selectedCourse.image && (
-          <div className="relative w-full border-b border-gray-200 dark:border-white/10 bg-[#0a0f1c] flex items-center justify-center">
-           {parseImages(selectedCourse.image).length > 1 ? (<div className="w-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar">{parseImages(selectedCourse.image).map((img, idx) => (<MediaRenderer interactive={true} key={idx} src={img} alt={`${selectedCourse.title} ${idx + 1}`} className="w-full h-auto flex-shrink-0 object-contain snap-center bg-black mx-auto block" />))}</div>) : (<MediaRenderer interactive={true} src={parseImages(selectedCourse.image)[0]} alt={selectedCourse.title} className="w-full h-auto object-contain bg-black mx-auto block" />)}
+          <div className="relative w-full border-b border-gray-200 dark:border-white/10 bg-[#0a0f1c] flex items-center justify-center min-h-[380px]">
+            <div className="absolute top-4 left-4 z-20 rounded-full bg-black/70 text-white text-xs uppercase tracking-[0.2em] px-3 py-2 shadow-xl backdrop-blur-sm pointer-events-none">
+              Swipe or click arrows to browse
+            </div>
+            <ImageGallery images={parseImages(selectedCourse.image)} altBase={selectedCourse.title} onClose={() => setSelectedCourse(null)} />
           </div>
          )}
          <div className="p-8 sm:p-12 max-w-3xl mx-auto">

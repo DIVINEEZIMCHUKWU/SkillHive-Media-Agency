@@ -11,8 +11,8 @@ export default function Contact() {
    
    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
     <div className="text-center max-w-3xl mx-auto mb-20">
-    <h1 className="text-3xl md:text-4xl font-bold text-brand-black dark:text-white mb-6">Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-blue-400">Touch</span></h1>
-    <p className="text-base text-brand-black/70 dark:text-brand-white/70">
+    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-black dark:text-white mb-6">Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-blue-400">Touch</span></h1>
+    <p className="text-sm sm:text-base text-brand-black/70 dark:text-brand-white/70 leading-relaxed">
       Have a question or ready to start a project? We'd love to hear from you. Reach out to our team below.
      </p>
     </div>
@@ -28,8 +28,8 @@ export default function Contact() {
         </div>
         <div>
          <h3 className="text-lg font-semibold text-brand-black dark:text-white mb-1">Email Us</h3>
-         <p className="text-brand-black/70 dark:text-brand-white/70">Skillhivedigitalagency@gmail.com</p>
-         <p className="text-sm text-gray-500 mt-1">We aim to reply within 24 hours.</p>
+         <p className="text-brand-black/70 dark:text-brand-white/70 break-words whitespace-normal">Skillhivedigitalagency@gmail.com</p>
+         <p className="text-sm text-gray-500 mt-1 break-words whitespace-normal">We aim to reply within 24 hours.</p>
         </div>
        </div>
        
@@ -39,8 +39,8 @@ export default function Contact() {
         </div>
         <div>
          <h3 className="text-lg font-semibold text-brand-black dark:text-white mb-1">Call Us</h3>
-         <p className="text-brand-black/70 dark:text-brand-white/70">08125650249</p>
-         <p className="text-sm text-gray-500 mt-1">Mon-Fri from 9am to 6pm.</p>
+         <p className="text-brand-black/70 dark:text-brand-white/70 break-words whitespace-normal">08125650249</p>
+         <p className="text-sm text-gray-500 mt-1 break-words whitespace-normal">Mon-Fri from 9am to 6pm.</p>
         </div>
        </div>
 
@@ -50,16 +50,16 @@ export default function Contact() {
         </div>
         <div>
          <h3 className="text-lg font-semibold text-brand-black dark:text-white mb-1">Visit Us</h3>
-         <p className="text-brand-black/70 dark:text-brand-white/70">Abia State, Imo State, Enugu State and Remotely</p>
+         <p className="text-brand-black/70 dark:text-brand-white/70 break-words whitespace-normal">Abia State, Imo State, Enugu State and Remotely</p>
         </div>
        </div>
       </div>
 
       <div className="bg-brand-white dark:bg-brand-black border border-brand-blue/30 backdrop-blur-md rounded-3xl p-8">
-       <h3 className="text-xl font-bold text-brand-black dark:text-white mb-4">Fastest Way to Reach Us</h3>
-       <p className="text-brand-black/70 dark:text-brand-white/70 mb-6">Need an immediate response? Send us a message directly on WhatsApp.</p>
+       <h3 className="text-lg sm:text-xl font-bold text-brand-black dark:text-white mb-4">Fastest Way to Reach Us</h3>
+       <p className="text-sm sm:text-base text-brand-black/70 dark:text-brand-white/70 mb-6">Need an immediate response? Send us a message directly on WhatsApp.</p>
        <a
-        href="https://wa.me/2348125650249"
+        href="https://wa.me/2348125650249?text=Hello%20SkillHive%20Media%20Agency%2C%20I%20came%20directly%20from%20your%20Website%20and%20I%20want%20to%20make%20an%20enquiry"
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center gap-2 bg-[#25D366] text-white px-6 py-3 rounded-full font-medium hover:bg-[#1EBE5D] transition-colors w-full justify-center shadow-lg shadow-[#25D366]/20 hover:shadow-xl hover:-translate-y-0.5"
@@ -72,7 +72,7 @@ export default function Contact() {
 
      {/* Contact Form */}
      <div className="bg-brand-white dark:bg-brand-black border border-brand-blue/30 backdrop-blur-md rounded-3xl p-10 shadow-sm">
-      <h2 className="text-2xl font-bold text-brand-black dark:text-white mb-8">Send a Message</h2>
+      <h2 className="text-xl sm:text-2xl font-bold text-brand-black dark:text-white mb-8">Send a Message</h2>
       {submitted ? (
        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl p-8 text-center">
         <div className="w-16 h-16 bg-green-100 dark:bg-green-800/30 rounded-full flex items-center justify-center mx-auto mb-4 text-green-600 dark:text-green-400">

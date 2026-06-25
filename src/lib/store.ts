@@ -222,8 +222,8 @@ export const parseImages = (imgStr: string | undefined): string[] => {
   
   let resultStr = imgStr;
   
-  // Convert Google Drive view links to direct image links
-  const gDriveMatch = imgStr.match(/drive\.google\.com\/file\/d\/([^/]+)\/view/);
+  // Convert Google Drive view/open links to direct image links
+  const gDriveMatch = imgStr.match(/drive\.google\.com\/file\/d\/([^/]+)\/view/) || imgStr.match(/drive\.google\.com\/open\?id=([^&]+)/) || imgStr.match(/drive\.google\.com\/uc\?id=([^&]+)/);
   if (gDriveMatch && gDriveMatch[1]) {
     resultStr = `https://drive.google.com/uc?id=${gDriveMatch[1]}&export=download`;
   }
@@ -231,11 +231,10 @@ export const parseImages = (imgStr: string | undefined): string[] => {
   try {
     const parsed = JSON.parse(resultStr);
     if (Array.isArray(parsed)) return parsed.map(url => {
-        const driveMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)\/view/);
+        const driveMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)\/view/) || url.match(/drive\.google\.com\/open\?id=([^&]+)/) || url.match(/drive\.google\.com\/uc\?id=([^&]+)/);
         return driveMatch && driveMatch[1] ? `https://drive.google.com/uc?id=${driveMatch[1]}&export=download` : url;
     });
-  } catch (e) {}
-  
+  } catch (e) {}  
   return [resultStr];
 };
 

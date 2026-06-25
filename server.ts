@@ -1,15 +1,19 @@
 import express from "express";
 import path from "path";
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 // Load .env into process.env for the server (ensures GEMINI_API_KEY is available)
 dotenv.config();
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 
   app.use(express.json());
+  // Enable CORS so a separately hosted frontend can call this API.
+  // Restrict origin in production by setting FRONTEND_ORIGIN env var.
+  app.use(cors({ origin: process.env.FRONTEND_ORIGIN || '*' }));
 
   // API route for Paystack initialize
   app.post("/api/paystack/initialize", async (req, res) => {
@@ -52,14 +56,16 @@ async function startServer() {
       }
 
       const ajaxUrl = _formUrl.replace('formsubmit.co/', 'formsubmit.co/ajax/');
+      const originHeader = req.headers.origin || `${req.protocol}://${req.get('host')}`;
+      const refererHeader = req.headers.referer || `${req.protocol}://${req.get('host')}/contact`;
       
       const response = await fetch(ajaxUrl, {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Origin': 'https://skillhivedigital.agency',
-          'Referer': 'https://skillhivedigital.agency/contact'
+          'Origin': originHeader,
+          'Referer': refererHeader
         },
         body: JSON.stringify(data)
       });
@@ -73,6 +79,10 @@ async function startServer() {
   });
 
   // AI route using Gemini
+  app.get("/api/health", (_req, res) => {
+    res.json({ status: 'ok' });
+  });
+
   app.post("/api/chat", async (req, res) => {
     try {
       const { messages } = req.body;
@@ -108,7 +118,7 @@ async function startServer() {
     } catch (error: any) {
       console.error("Gemini Error:", error);
       const isInvalidKey = error.status === 400 || error.message?.includes("API key not valid") || error.status === "INVALID_ARGUMENT";
-      res.json({ text: isInvalidKey ? "The AI Assistant is currently offline (Invalid API Key)." : "Failed to communicate with AI Assistant." });
+      res.status(500).json({ text: isInvalidKey ? "The AI Assistant is currently offline (Invalid API Key)." : "Failed to communicate with AI Assistant." });
     }
   });
 

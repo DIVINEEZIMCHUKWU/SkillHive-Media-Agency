@@ -43,12 +43,14 @@ export default function MediaRenderer({ src, className, alt = "Media", onClick, 
   }
 
   // Google Drive
-  const driveIdMatch = src.match(/id=([^&]+)/) || src.match(/file\/d\/([^/]+)/);
+  const driveIdMatch = src.match(/id=([^&]+)/) || src.match(/file\/d\/([^/]+)(?:\/|$)/);
   if (driveIdMatch && driveIdMatch[1] && (src.includes('drive.google.com') || src.includes('docs.google.com'))) {
     const fileId = driveIdMatch[1];
-    const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+    const previewUrl = `https://drive.google.com/file/d/${fileId}/preview?usp=sharing`;
     const thumbnailUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+    const directDownload = `https://drive.google.com/uc?export=download&id=${fileId}`;
 
+    // If not interactive just show a thumbnail with play overlay
     if (!interactive) {
       return (
         <div className={`relative overflow-hidden bg-black ${className || ''}`} onClick={onClick}>
@@ -62,16 +64,11 @@ export default function MediaRenderer({ src, className, alt = "Media", onClick, 
       );
     }
 
+    // For interactive playback try a direct video stream first (works when file is publicly shared as a raw video file).
+    // If the direct stream errors, fall back to the Drive preview iframe.
     return (
       <div className={`relative overflow-hidden bg-black ${className || ''}`} onClick={onClick}>
-        <iframe 
-          src={previewUrl} 
-          className="absolute inset-0 w-full h-full" 
-          frameBorder="0" 
-          allow="autoplay; encrypted-media" 
-          allowFullScreen
-          title={alt}
-        ></iframe>
+        <VideoOrIframe key={fileId} previewUrl={previewUrl} directDownload={directDownload} alt={alt} objectFit={objectFit} />
       </div>
     );
   }
@@ -112,6 +109,37 @@ export default function MediaRenderer({ src, className, alt = "Media", onClick, 
       className={className} 
       referrerPolicy="no-referrer"
       onClick={onClick}
+    />
+  );
+}
+
+// Helper component used above to try direct video playback first and fall back to Drive iframe preview.
+function VideoOrIframe({ previewUrl, directDownload, alt, objectFit }: { previewUrl: string, directDownload: string, alt?: string, objectFit?: string }) {
+  const [useIframe, setUseIframe] = useState(false);
+  const [errored, setErrored] = useState(false);
+
+  if (useIframe || errored) {
+    return (
+      <iframe
+        src={previewUrl}
+        className={`absolute inset-0 w-full h-full`
+        }
+        frameBorder="0"
+        allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+        allowFullScreen
+        title={alt}
+      />
+    );
+  }
+
+  return (
+    <video
+      src={directDownload}
+      className={`absolute inset-0 w-full h-full ${objectFit}`}
+      controls
+      onError={() => setErrored(true)}
+      onAbort={() => setErrored(true)}
+      preload="metadata"
     />
   );
 }

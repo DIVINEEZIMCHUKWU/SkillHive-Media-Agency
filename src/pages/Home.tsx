@@ -18,6 +18,7 @@ import { ResultItem, EventItem, TestimonialItem, getResults, getEvents, getTesti
 import { motion, AnimatePresence } from "motion/react";
 import ProjectModal from "../components/ProjectModal";
 import MediaRenderer from "../components/MediaRenderer";
+import ImageCarousel from "../components/ImageCarousel";
 
 export default function Home() {
  const [results, setResults] = useState<ResultItem[]>([]);
@@ -397,6 +398,18 @@ export default function Home() {
           <div className="w-full h-48 mb-6 rounded-2xl overflow-hidden relative shrink-0">
            {item.videoUrl ? (
             <MediaRenderer interactive={false} src={item.videoUrl} alt={item.clientName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none" />
+           ) : parseImages(item.image).length > 1 ? (
+            <div className="relative h-full">
+             <div className="absolute top-4 left-4 z-20 rounded-full bg-black/60 text-white text-[11px] uppercase tracking-[0.15em] px-3 py-2 shadow-lg backdrop-blur-sm flex items-center gap-2 pointer-events-none">
+              <ArrowRight className="w-3 h-3 transform rotate-180" />
+              <span>Scroll</span>
+             </div>
+             <div className="absolute top-4 right-4 z-20 rounded-full bg-black/60 text-white text-[11px] uppercase tracking-[0.15em] px-3 py-2 shadow-lg backdrop-blur-sm flex items-center gap-2 pointer-events-none">
+              <span>Scroll</span>
+              <ArrowRight className="w-3 h-3" />
+             </div>
+             <ImageCarousel images={parseImages(item.image)} altBase={item.clientName} />
+            </div>
            ) : (
             <MediaRenderer interactive={false} src={parseImages(item.image)[0] || ''} alt={item.clientName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none" />
            )}

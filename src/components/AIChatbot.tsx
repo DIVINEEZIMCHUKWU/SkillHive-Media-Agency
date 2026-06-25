@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageSquare, X, Send, Bot, Sparkles } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function AIChatbot() {
  const [isOpen, setIsOpen] = useState(false);
@@ -13,6 +13,36 @@ export default function AIChatbot() {
  const [input, setInput] = useState('');
 
  const [isLoading, setIsLoading] = useState(false);
+ const [backendHealthy, setBackendHealthy] = useState<'unknown' | 'ok' | 'failed'>('unknown');
+
+ const getApiBase = () => {
+  const envBase = (import.meta as any).env?.VITE_API_BASE?.trim() || '';
+  if (envBase) return envBase.replace(/\/+$|$/, '');
+  return typeof window !== 'undefined' ? window.location.origin : '';
+ };
+
+ const getApiEndpoint = (path: string) => {
+  const base = getApiBase();
+  return base ? `${base.replace(/\/+$|$/, '')}${path}` : path;
+ };
+
+ useEffect(() => {
+  const checkHealth = async () => {
+   const healthUrl = getApiEndpoint('/api/health');
+   try {
+    const res = await fetch(healthUrl, { method: 'GET' });
+    if (res.ok) {
+     setBackendHealthy('ok');
+    } else {
+     setBackendHealthy('failed');
+    }
+   } catch {
+    setBackendHealthy('failed');
+   }
+  };
+
+  checkHealth();
+ }, []);
 
  const handleSend = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -24,22 +54,39 @@ export default function AIChatbot() {
   setIsLoading(true);
 
   try {
-   const res = await fetch('/api/chat', {
+   const endpoint = getApiEndpoint('/api/chat');
+   const res = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ messages: newMessages })
    });
-    let data: any = null;
-    try {
-     data = await res.json();
-    } catch (e) {
-     data = null;
-    }
-
+     let data: any = null;
+     const contentType = res.headers.get('content-type') || '';
+     if (contentType.includes('application/json')) {
+      try {
+       data = await res.json();
+      } catch (e) {
+       data = null;
+      }
+     } else {
+      // non-JSON response (likely HTML from a static host or missing backend)
+      const text = await res.text().catch(() => '');
+      const isHtml = contentType.includes('text/html') || /<html/i.test(text);
+      data = { text: text || null, __isHtml: isHtml };
+     }
     if (res.ok && data && data.text) {
      setMessages((prev) => [...prev, { role: 'ai', text: data.text }]);
     } else {
-     const serverMsg = data?.error || data?.message || res.statusText || 'Sorry, I encountered an error. Please try again.';
+     let serverMsg = 'Sorry, I encountered an error. Please try again.';
+     if (res.status === 404) serverMsg = 'AI Assistant unavailable — backend API route is missing. Please deploy the Node server or set VITE_API_BASE to the deployed backend URL.';
+     else if (data?.__isHtml) serverMsg = `AI Assistant unavailable — API returned HTML from ${endpoint}. This usually means the frontend is deployed without the backend server or the API path is incorrect.`;
+     else if (res.status >= 500) serverMsg = 'AI Assistant server error. Please try again later.';
+     else if (data?.text) serverMsg = data.text;
+     else if (data?.error) serverMsg = data.error;
+     else if (data?.message) serverMsg = data.message;
+     else if (res.statusText) serverMsg = `${res.status} ${res.statusText}`;
+
+     console.error('AI assistant error response:', { status: res.status, statusText: res.statusText, body: data });
      setMessages((prev) => [...prev, { role: 'ai', text: serverMsg }]);
     }
   } catch (error) {
@@ -82,6 +129,11 @@ export default function AIChatbot() {
          <X className="w-5 h-5" />
         </button>
        </div>
+       {backendHealthy === 'failed' && (
+        <div className="bg-red-50 dark:bg-red-900/25 text-red-700 dark:text-red-200 px-4 py-3 text-sm border border-red-200 dark:border-red-800 rounded-b-2xl">
+         AI backend is not reachable. Please ensure the Node server is deployed and VITE_API_BASE is configured if the backend is hosted separately.
+        </div>
+       )}
 
        {/* Messages Area */}
        <div className="h-80 overflow-y-auto p-4 flex flex-col gap-4 bg-white dark:bg-[#0F0F12]/95 no-scrollbar text-sm">

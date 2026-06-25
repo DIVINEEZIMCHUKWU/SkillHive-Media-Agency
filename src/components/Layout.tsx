@@ -90,6 +90,7 @@ export default function Layout() {
     <div className="flex items-center flex-shrink-0 mr-6">
      <Link to="/" className="flex items-center gap-3 group">
       <img src="https://i.ibb.co/dwQtCCjV/20260528-120300.png" alt="SkillHive Logo" className="h-8 md:h-10 w-auto transform group-hover:scale-105 transition-all bg-white p-1.5 rounded-lg" />
+      <span className="font-black text-sm leading-none tracking-tight text-brand-black dark:text-white sm:hidden whitespace-nowrap">SkillHive Media Agency</span>
       <span className="font-black text-lg md:text-xl tracking-tight text-brand-black dark:text-white hidden sm:inline">SkillHive</span>
      </Link>
     </div>
@@ -112,7 +113,7 @@ export default function Layout() {
     </div>
 
     {/* Right Controls */}
-    <div className="flex items-center gap-3 lg:gap-4 ml-auto border-l border-gray-200 dark:border-white/10 pl-4 lg:pl-6 flex-shrink-0">
+    <div className="hidden md:flex items-center gap-3 lg:gap-4 ml-auto border-l border-gray-200 dark:border-white/10 pl-4 lg:pl-6 flex-shrink-0">
      <button
       onClick={toggleTheme}
       className="p-1.5 lg:p-2 rounded-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-brand-black dark:text-white hover:bg-gray-200 dark:hover:bg-white/10 transition-colors flex-shrink-0"
@@ -270,7 +271,7 @@ export default function Layout() {
    <AIChatbot />
    
    <a
-    href="https://wa.me/2348125650249"
+    href="https://wa.me/2348125650249?text=Hello%20SkillHive%20Media%20Agency%2C%20I%20came%20directly%20from%20your%20Website%20and%20I%20want%20to%20make%20an%20enquiry"
     target="_blank"
     rel="noopener noreferrer"
     className="fixed bottom-6 right-6 bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:bg-[#1EBE5D] hover:-translate-y-1 transition-all z-50 flex items-center justify-center group"

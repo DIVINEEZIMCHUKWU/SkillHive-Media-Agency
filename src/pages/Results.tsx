@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { ResultItem, getResults, parseImages } from '../lib/store';
 import ProjectModal from '../components/ProjectModal';
 import MediaRenderer from '../components/MediaRenderer';
+import ImageCarousel from '../components/ImageCarousel';
 
 export default function Results() {
  const categories = ['Social Media Management', 'Facebook & Instagram Ads', 'Content Creation/Graphic Design', 'Website Development'];
@@ -64,10 +65,16 @@ export default function Results() {
                  </div>
                 ) : null}
                 {parseImages(item.image).length > 1 ? (
-                 <div className="w-full h-full flex overflow-x-auto snap-x snap-mandatory pointer-events-none">
-                  {parseImages(item.image).map((img, i) => (
-                   <MediaRenderer interactive={false} key={i} src={img} alt={`${item.clientName} ${i+1}`} className="w-full h-full flex-shrink-0 object-cover snap-center" />
-                  ))}
+                 <div className="relative w-full h-full">
+                  <div className="absolute top-4 left-4 z-20 rounded-full bg-black/60 text-white text-[11px] uppercase tracking-[0.15em] px-3 py-2 shadow-lg backdrop-blur-sm flex items-center gap-2 pointer-events-none">
+                   <ArrowRight className="w-3 h-3 transform rotate-180" />
+                   <span>Scroll</span>
+                  </div>
+                  <div className="absolute top-4 right-4 z-20 rounded-full bg-black/60 text-white text-[11px] uppercase tracking-[0.15em] px-3 py-2 shadow-lg backdrop-blur-sm flex items-center gap-2 pointer-events-none">
+                   <span>Scroll</span>
+                   <ArrowRight className="w-3 h-3" />
+                  </div>
+                  <ImageCarousel images={parseImages(item.image)} altBase={item.clientName} />
                  </div>
                 ) : (
                  <MediaRenderer interactive={false} src={parseImages(item.image)[0] || item.videoUrl || ''} alt={item.clientName} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 block pointer-events-none" />

@@ -44,26 +44,61 @@ export const submitToFormsubmit = async (e: React.FormEvent, formUrl: string, on
   });
   saveLeads(leads);
   
-  // Attempt FormSubmit via our backend proxy to avoid showing the preview URL in the email
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const referer = origin || 'https://skillhivedigital.agency/contact';
+
+  const proxyPayload = {
+    _formUrl: formUrl,
+    ...data
+  };
+  const directPayload = { ...data };
+  const ajaxUrl = formUrl.replace('formsubmit.co/', 'formsubmit.co/ajax/');
+
+  const submitDirectly = async () => {
+    const response = await fetch(ajaxUrl, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Origin': origin,
+        'Referer': referer
+      },
+      body: JSON.stringify(directPayload)
+    });
+    if (!response.ok) {
+      const text = await response.text().catch(() => '');
+      throw new Error(`Direct FormSubmit failed: ${response.status} ${response.statusText} ${text}`);
+    }
+  };
+
+  let submittedSuccessfully = false;
   try {
-    const payload = {
-      _formUrl: formUrl,
-      ...data
-    };
     const response = await fetch('/api/contact', {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(proxyPayload)
     });
     if (!response.ok) {
-      console.error("Formsubmit responded with an error:", await response.text());
+      const text = await response.text().catch(() => '');
+      throw new Error(`Proxy request failed: ${response.status} ${response.statusText} ${text}`);
     }
+    submittedSuccessfully = true;
   } catch (err) {
-    console.error("Submit failed.", err);
+    console.warn("Proxy contact submission failed, falling back to FormSubmit directly.", err);
+    try {
+      await submitDirectly();
+      submittedSuccessfully = true;
+    } catch (directError) {
+      console.error("Direct FormSubmit fallback failed.", directError);
+    }
   }
 
-  onSuccess();
+  if (submittedSuccessfully) {
+    onSuccess();
+  } else {
+    throw new Error("Contact form submission failed.");
+  }
 };

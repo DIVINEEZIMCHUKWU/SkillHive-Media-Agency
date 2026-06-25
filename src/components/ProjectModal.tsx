@@ -1,12 +1,10 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { ResultItem, parseImages } from '../lib/store';
 import { X, Play, ExternalLink, CheckCircle2 } from 'lucide-react';
-import { useState } from 'react';
+import ImageGallery from './ImageGallery';
 import MediaRenderer from './MediaRenderer';
 
 export default function ProjectModal({ project, isOpen, onClose }: { project: ResultItem | null, isOpen: boolean, onClose: () => void }) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
   if (!project || !isOpen) return null;
   const images = parseImages(project.image);
 
@@ -41,19 +39,8 @@ export default function ProjectModal({ project, isOpen, onClose }: { project: Re
                  <MediaRenderer interactive={true} src={project.videoUrl} alt={project.clientName} className="absolute inset-0 w-full h-full object-contain bg-black" />
                </div>
             ) : (
-               <div className="flex-grow relative">
-                 <MediaRenderer interactive={true} src={images[currentImageIndex]} alt={project.clientName} className="absolute inset-0 w-full h-full object-contain bg-black" />
-                 {images.length > 1 && (
-                   <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-                     {images.map((_, idx) => (
-                       <button 
-                         key={idx} 
-                         onClick={() => setCurrentImageIndex(idx)}
-                         className={`w-3 h-3 rounded-full transition-colors ${currentImageIndex === idx ? 'bg-brand-blue' : 'bg-white/50 hover:bg-white'}`}
-                       />
-                     ))}
-                   </div>
-                 )}
+               <div className="flex-grow relative min-h-[320px]">
+                 <ImageGallery images={images} altBase={project.clientName} onClose={onClose} />
                </div>
             )}
           </div>
