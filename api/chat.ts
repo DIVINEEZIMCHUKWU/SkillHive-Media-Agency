@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const allowedOrigins = [
+  'https://skillhivemediaagency1.vercel.app',
   'https://skillhive.name.ng',
   'https://www.skillhive.name.ng',
   'http://localhost:5173',

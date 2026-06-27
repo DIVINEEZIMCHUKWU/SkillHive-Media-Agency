@@ -15,35 +15,56 @@ export default function AIChatbot() {
  const [isLoading, setIsLoading] = useState(false);
  const [backendHealthy, setBackendHealthy] = useState<'unknown' | 'ok' | 'failed'>('unknown');
 
- const getApiBase = () => {
+ const getApiBaseCandidates = () => {
   const envBase = (import.meta as any).env?.VITE_API_BASE?.trim() || '';
-  if (envBase) return envBase.replace(/\/+$|$/, '');
+  const candidates = new Set<string>();
 
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    return window.location.origin;
+  if (envBase) {
+   candidates.add(envBase.replace(/\/+$/,'').replace(/\/$/, ''));
   }
 
-  return 'https://skillhive.name.ng';
+  if (typeof window !== 'undefined') {
+   const currentOrigin = window.location.origin.replace(/\/+$/,'');
+   if (currentOrigin) {
+    candidates.add(currentOrigin);
+   }
+
+   if (window.location.hostname === 'www.skillhive.name.ng') {
+    candidates.add('https://skillhive.name.ng');
+   }
+
+   if (window.location.hostname === 'skillhive.name.ng') {
+    candidates.add('https://www.skillhive.name.ng');
+   }
+  }
+
+  candidates.add('https://skillhivemediaagency1.vercel.app');
+  candidates.add('https://skillhive.name.ng');
+  candidates.add('https://www.skillhive.name.ng');
+
+  return Array.from(candidates).filter(Boolean);
  };
 
- const getApiEndpoint = (path: string) => {
-  const base = getApiBase();
-  return base ? `${base.replace(/\/+$|$/, '')}${path}` : path;
+ const getApiEndpoints = (path: string) => {
+  return getApiBaseCandidates().map((base) => `${base.replace(/\/+$/,'')}${path}`);
  };
 
  useEffect(() => {
   const checkHealth = async () => {
-   const healthUrl = getApiEndpoint('/api/chat');
-   try {
-    const res = await fetch(healthUrl, { method: 'OPTIONS' });
-    if (res.ok || res.status === 204) {
-     setBackendHealthy('ok');
-    } else {
-     setBackendHealthy('failed');
+   const endpoints = getApiEndpoints('/api/chat');
+   for (const healthUrl of endpoints) {
+    try {
+     const res = await fetch(healthUrl, { method: 'OPTIONS' });
+     if (res.ok || res.status === 204) {
+      setBackendHealthy('ok');
+      return;
+     }
+    } catch {
+     // Try the next candidate if this one is unavailable.
     }
-   } catch {
-    setBackendHealthy('failed');
    }
+
+   setBackendHealthy('failed');
   };
 
   checkHealth();
@@ -59,12 +80,18 @@ export default function AIChatbot() {
   setIsLoading(true);
 
   try {
-   const endpoint = getApiEndpoint('/api/chat');
-   const res = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ messages: newMessages })
-   });
+   const endpoints = getApiEndpoints('/api/chat');
+   let lastError: any = null;
+   let lastEndpoint = '';
+
+   for (const endpoint of endpoints) {
+    try {
+     const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: newMessages })
+     });
+
      let data: any = null;
      const contentType = res.headers.get('content-type') || '';
      if (contentType.includes('application/json')) {
@@ -74,26 +101,42 @@ export default function AIChatbot() {
        data = null;
       }
      } else {
-      // non-JSON response (likely HTML from a static host or missing backend)
       const text = await res.text().catch(() => '');
       const isHtml = contentType.includes('text/html') || /<html/i.test(text);
       data = { text: text || null, __isHtml: isHtml };
      }
-    if (res.ok && data && data.text) {
-     setMessages((prev) => [...prev, { role: 'ai', text: data.text }]);
-    } else {
+
+     if (res.status === 404) {
+      lastError = { endpoint, status: res.status, body: data };
+      lastEndpoint = endpoint;
+      continue;
+     }
+
+     if (res.ok && data && data.text) {
+      setMessages((prev) => [...prev, { role: 'ai', text: data.text }]);
+      return;
+     }
+
      let serverMsg = 'Sorry, I encountered an error. Please try again.';
-     if (res.status === 404) serverMsg = 'AI Assistant unavailable — backend API route is missing. Please deploy the Node server or set VITE_API_BASE to the deployed backend URL.';
-     else if (data?.__isHtml) serverMsg = `AI Assistant unavailable — API returned HTML from ${endpoint}. This usually means the frontend is deployed without the backend server or the API path is incorrect.`;
+     if (res.status === 404) serverMsg = 'AI Assistant unavailable — the chat endpoint could not be found. Please ensure the Vercel function is deployed and that VITE_API_BASE points to the correct backend URL if needed.';
+     else if (data?.__isHtml) serverMsg = `AI Assistant unavailable — API returned HTML from ${endpoint}. This usually means the frontend is deployed without the backend service or the API path is incorrect.`;
      else if (res.status >= 500) serverMsg = 'AI Assistant server error. Please try again later.';
      else if (data?.text) serverMsg = data.text;
      else if (data?.error) serverMsg = data.error;
      else if (data?.message) serverMsg = data.message;
      else if (res.statusText) serverMsg = `${res.status} ${res.statusText}`;
 
-     console.error('AI assistant error response:', { status: res.status, statusText: res.statusText, body: data });
+     console.error('AI assistant error response:', { status: res.status, statusText: res.statusText, body: data, endpoint });
      setMessages((prev) => [...prev, { role: 'ai', text: serverMsg }]);
+     return;
+    } catch (error) {
+     lastError = error;
+     lastEndpoint = endpoint;
     }
+   }
+
+   const message = (lastError as any)?.message || 'AI Assistant unavailable — the chat endpoint could not be reached. Please ensure the Vercel function is deployed and that VITE_API_BASE points to the correct backend URL if needed.';
+   setMessages((prev) => [...prev, { role: 'ai', text: message }]);
   } catch (error) {
     const message = (error as any)?.message || 'Network error. Please try again later.';
     setMessages((prev) => [...prev, { role: 'ai', text: message }]);
