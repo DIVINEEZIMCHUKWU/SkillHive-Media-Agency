@@ -18,7 +18,12 @@ export default function AIChatbot() {
  const getApiBase = () => {
   const envBase = (import.meta as any).env?.VITE_API_BASE?.trim() || '';
   if (envBase) return envBase.replace(/\/+$|$/, '');
-  return typeof window !== 'undefined' ? window.location.origin : '';
+
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return window.location.origin;
+  }
+
+  return 'https://skillhive.name.ng';
  };
 
  const getApiEndpoint = (path: string) => {
@@ -28,10 +33,10 @@ export default function AIChatbot() {
 
  useEffect(() => {
   const checkHealth = async () => {
-   const healthUrl = getApiEndpoint('/api/health');
+   const healthUrl = getApiEndpoint('/api/chat');
    try {
-    const res = await fetch(healthUrl, { method: 'GET' });
-    if (res.ok) {
+    const res = await fetch(healthUrl, { method: 'OPTIONS' });
+    if (res.ok || res.status === 204) {
      setBackendHealthy('ok');
     } else {
      setBackendHealthy('failed');
@@ -131,7 +136,7 @@ export default function AIChatbot() {
        </div>
        {backendHealthy === 'failed' && (
         <div className="bg-red-50 dark:bg-red-900/25 text-red-700 dark:text-red-200 px-4 py-3 text-sm border border-red-200 dark:border-red-800 rounded-b-2xl">
-         AI backend is not reachable. Please ensure the Node server is deployed and VITE_API_BASE is configured if the backend is hosted separately.
+         AI backend is not reachable. Please ensure the Vercel AI function is deployed and the site is configured to use the correct API base.
         </div>
        )}
 

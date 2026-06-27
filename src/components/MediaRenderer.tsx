@@ -68,7 +68,7 @@ export default function MediaRenderer({ src, className, alt = "Media", onClick, 
     // If the direct stream errors, fall back to the Drive preview iframe.
     return (
       <div className={`relative overflow-hidden bg-black ${className || ''}`} onClick={onClick}>
-        <VideoOrIframe key={fileId} previewUrl={previewUrl} directDownload={directDownload} alt={alt} objectFit={objectFit} />
+        <VideoOrIframe previewUrl={previewUrl} directDownload={directDownload} alt={alt} objectFit={objectFit} />
       </div>
     );
   }

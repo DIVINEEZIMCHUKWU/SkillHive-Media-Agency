@@ -78,48 +78,9 @@ async function startServer() {
     }
   });
 
-  // AI route using Gemini
+  // AI health route for compatibility with the frontend assistant checks.
   app.get("/api/health", (_req, res) => {
     res.json({ status: 'ok' });
-  });
-
-  app.post("/api/chat", async (req, res) => {
-    try {
-      const { messages } = req.body;
-      const apiKey = process.env.GEMINI_API_KEY;
-
-      if (!apiKey) {
-        return res.status(500).json({ error: "Server misconfiguration. GEMINI_API_KEY is missing." });
-      }
-
-      // We dynamically import to avoid breaking if package is somehow missing
-      const { GoogleGenAI } = await import("@google/genai");
-      const ai = new GoogleGenAI({ apiKey });
-
-      // create concise system instruction
-      const systemInstruction = 
-        "You are the SkillHive AI Assistant. You help users grow their business, explore services, book consultations, " +
-        "and answer general inquiries about marketing, training, and strategic solutions. Keep answers concise, helpful and engaging.";
-
-      const formattedContents = messages.map((m: any) => ({
-        role: m.role === "ai" ? "model" : "user",
-        parts: [{ text: m.text }]
-      }));
-
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: formattedContents,
-        config: {
-          systemInstruction,
-        }
-      });
-
-      res.json({ text: response.text });
-    } catch (error: any) {
-      console.error("Gemini Error:", error);
-      const isInvalidKey = error.status === 400 || error.message?.includes("API key not valid") || error.status === "INVALID_ARGUMENT";
-      res.status(500).json({ text: isInvalidKey ? "The AI Assistant is currently offline (Invalid API Key)." : "Failed to communicate with AI Assistant." });
-    }
   });
 
   // Vite middleware for development

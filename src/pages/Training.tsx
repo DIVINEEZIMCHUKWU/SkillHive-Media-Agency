@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, BookOpen, X, Calendar as CalendarIcon } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type MouseEvent } from 'react';
 import { TrainingCourse, getCourses, parseImages } from '../lib/store';
 import { motion, AnimatePresence } from 'motion/react';
 import ImageCarousel from '../components/ImageCarousel';
@@ -18,7 +18,7 @@ export default function Training() {
   return () => window.removeEventListener('coursesUpdated', handleCoursesUpdated);
  }, []);
 
- const handleEnroll = (e: React.MouseEvent, course: TrainingCourse) => {
+ const handleEnroll = (e: MouseEvent, course: TrainingCourse) => {
   e.stopPropagation();
   if (course.link) {
    window.open(course.link, '_blank');

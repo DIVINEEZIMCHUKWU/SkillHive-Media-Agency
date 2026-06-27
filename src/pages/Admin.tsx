@@ -275,7 +275,7 @@ export default function Admin() {
     });
   };
 
-  const promises = files.map(file => resizeImage(file));
+  const promises = files.map(file => resizeImage(file as File));
   const results = await Promise.all(promises);
   
   let existing: string[] = [];
