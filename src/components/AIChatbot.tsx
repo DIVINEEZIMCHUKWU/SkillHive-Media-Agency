@@ -177,11 +177,6 @@ export default function AIChatbot() {
          <X className="w-5 h-5" />
         </button>
        </div>
-       {backendHealthy === 'failed' && (
-        <div className="bg-red-50 dark:bg-red-900/25 text-red-700 dark:text-red-200 px-4 py-3 text-sm border border-red-200 dark:border-red-800 rounded-b-2xl">
-         AI backend is not reachable. Please ensure the Vercel AI function is deployed and the site is configured to use the correct API base.
-        </div>
-       )}
 
        {/* Messages Area */}
        <div className="h-80 overflow-y-auto p-4 flex flex-col gap-4 bg-white dark:bg-[#0F0F12]/95 no-scrollbar text-sm">
